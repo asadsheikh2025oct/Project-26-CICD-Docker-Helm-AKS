@@ -1,0 +1,13 @@
+# Global Registry info
+
+registry: myacrregistry20260413.azurecr.io
+
+frontend:
+  replicaCount: 1
+  image: weather-frontend
+  tag: v2
+
+backend:
+  replicaCount: 2
+  image: weather-backend
+  tag: v1

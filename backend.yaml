@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-backend
+spec:
+  replicas: 2 # Running two copies for high availability
+  selector:
+    matchLabels:
+      app: weather-backend
+  template:
+    metadata:
+      labels:
+        app: weather-backend
+    spec:
+      containers:
+      - name: backend-container
+        image: myacrregistry20260413.azurecr.io/weather-backend:v1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-backend-service
+spec:
+  selector:
+    app: weather-backend
+  ports:
+    - protocol: TCP
+      port: 80       # The port the Frontend will call
+      targetPort: 8080 # The port the Backend app is listening on
+  type: LoadBalancer

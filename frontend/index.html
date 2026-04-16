@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Weather Dashboard</h1>
+    <div id="data">Loading weather...</div>
+    <script>
+        // We will update this URL later once we have our AKS LoadBalancer IP
+        fetch('http://51.104.53.62')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('data').innerText = `It is ${data.temp} and ${data.condition} in ${data.city}.`;
+            });
+    </script>
+</body>
+</html>
