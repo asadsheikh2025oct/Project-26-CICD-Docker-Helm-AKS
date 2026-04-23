@@ -5,7 +5,7 @@ registry: myacrregistry20260413.azurecr.io
 frontend:
   replicaCount: 1
   image: weather-frontend
-  tag: v2
+  tag: v1
 
 backend:
   replicaCount: 2
