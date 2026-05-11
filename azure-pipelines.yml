@@ -1,41 +1,52 @@
 trigger:
-  branches:
-    include:
-      - main
-
-  paths:
-    exclude:
-      - '*.png'
-      - README.md
-      - '*.txt'
+- main
 
 variables:
-dockerRegistryServiceConnection = 'acr-service-connection'
-acrLoginServer = 'myacrregistry20260413.azureacr.io'
-tag = '$(Build.BuildId)'
+  
+  dockerRegistryServiceConnection: 'acr-service-connection'
+  acrHost: 'myacrregistry20260413.azurecr.io'
+  tag: '$(Build.BuildId)'
 
 stages:
-  - stage: BuildAndPush
-    displayName: 'Build Images'
-    jobs:
-      - job:
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: Docker@2
-            displayName: 'Build and Push Backend Image'
-            inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: 'backend'
-              command: 'buildAndPush'
-              Dockerfile: 'backend/Dockerfile'
-              tags: $(tag)
+- stage: Build
+  jobs:
+  - job: BuildAndPush
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    # Build & Push Backend Image
+    - task: Docker@2
+      displayName: 'Build and Push Backend'
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: 'backend'
+        dockerfile: 'backend/Dockerfile'
+        tags: $(tag)
 
-          - task: Docker@2
-            inputs:
-              command: 'buildAndPush'
-              Dockerfile: 'frontend/Dockerfile'
-              repository: 'frontend'
-              containerRegistry: $(dockerRegistryServiceConnection)
-              tags: $(tag)
-            displayName: 'Build and Push Frontend Image'
+    # Build & Push Frontend Image
+    - task: Docker@2
+      displayName: 'Build and Push Frontend'
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: 'frontend'
+        dockerfile: 'frontend/Dockerfile'
+        tags: $(tag)
+
+    # Push Helm Chart as an OCI Artifact
+    - task: AzureCLI@2
+      displayName: 'Package and Push Helm Chart'
+      inputs:
+        azureSubscription: $(SUB_ID) 
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          # 1. Login to ACR for Helm
+          USER_NAME="00000000-0000-0000-0000-000000000000"
+          PASSWORD=$(az acr login --name $(acrHost) --expose-token --output tsv --query accessToken)
+          helm registry login $(acrHost) --username $USER_NAME --password $PASSWORD
+
+          # 2. Package and Push
+          helm package ./my-web-app --version 1.0.$(Build.BuildId)
+          helm push my-web-app-1.0.$(Build.BuildId).tgz oci://$(acrHost)/helm
