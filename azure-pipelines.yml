@@ -38,7 +38,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Package and Push Helm Chart'
       inputs:
-        azureSubscription: $(SUB_ID) 
+        azureSubscription: 'arm-sc' 
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
