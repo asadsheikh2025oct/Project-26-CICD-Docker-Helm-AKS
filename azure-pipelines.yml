@@ -48,5 +48,5 @@ stages:
           helm registry login $(acrHost) --username $USER_NAME --password $PASSWORD
 
           # 2. Package and Push
-          helm package ./my-web-app --version 1.0.$(Build.BuildId)
-          helm push my-web-app-1.0.$(Build.BuildId).tgz oci://$(acrHost)/helm
+          helm package ./weather-app --version 1.0.$(Build.BuildId)
+          helm push weather-app-1.0.$(Build.BuildId).tgz oci://$(acrHost)/helm
