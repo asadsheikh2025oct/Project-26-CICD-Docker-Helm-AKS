@@ -6,5 +6,5 @@ metadata:
 spec:
   interval: 5m
   type: oci
-  url: oci://myacrregistry20260413.azurecr.io/helm/weather-app
+  url: oci://myacrregistry20260413.azurecr.io
   provider: azure

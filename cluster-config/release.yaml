@@ -7,11 +7,13 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: weather-app
-      version: "1.0.*" # This tells Flux to always grab the latest 1.0.x version
+      # If your chart is in the 'helm' folder of ACR, use 'helm/weather-app'
+      # If it's just at the root of ACR, use 'weather-app'
+      chart: weather-app 
+      version: "1.0.*"
       sourceRef:
         kind: HelmRepository
         name: acr-oci-repo
         namespace: flux-system
   values:
-    replicaCount: 2 # change this to 1 for your low-cost cluster
+    replicaCount: 1 # Keeping it low-cost for your B2s node
