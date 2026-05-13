@@ -7,3 +7,5 @@ spec:
   interval: 5m
   type: oci
   url: oci://myacrregistry20260413.azurecr.io/helm
+  # ADD THIS SECTION:
+  provider: azure
