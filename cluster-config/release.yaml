@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: weather-app-release
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: weather-app
+      version: "1.0.*" # This tells Flux to always grab the latest 1.0.x version
+      sourceRef:
+        kind: HelmRepository
+        name: acr-oci-repo
+        namespace: flux-system
+  values:
+    replicaCount: 2 # change this to 1 for your low-cost cluster
