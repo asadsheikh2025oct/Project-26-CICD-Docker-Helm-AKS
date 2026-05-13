@@ -9,7 +9,7 @@ spec:
     spec:
       # If your chart is in the 'helm' folder of ACR, use 'helm/weather-app'
       # If it's just at the root of ACR, use 'weather-app'
-      chart: weather-app 
+      chart: helm/weather-app 
       version: "1.0.*"
       sourceRef:
         kind: HelmRepository
