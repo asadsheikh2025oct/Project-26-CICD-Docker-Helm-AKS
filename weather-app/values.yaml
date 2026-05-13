@@ -4,10 +4,10 @@ registry: myacrregistry20260413.azurecr.io
 
 frontend:
   replicaCount: 1
-  image: weather-frontend
+  image: frontend
   tag: v1
 
 backend:
   replicaCount: 2
-  image: weather-backend
+  image: backend
   tag: v1
