@@ -1,0 +1,52 @@
+trigger:
+- main
+
+variables:
+  
+  dockerRegistryServiceConnection: 'acr-service-connection'
+  acrHost: 'myacrregistry20260413.azurecr.io'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildAndPush
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    # Build & Push Backend Image
+    - task: Docker@2
+      displayName: 'Build and Push Backend'
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: 'backend'
+        dockerfile: 'backend/Dockerfile'
+        tags: $(tag)
+
+    # Build & Push Frontend Image
+    - task: Docker@2
+      displayName: 'Build and Push Frontend'
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: 'frontend'
+        dockerfile: 'frontend/Dockerfile'
+        tags: $(tag)
+
+    # Push Helm Chart as an OCI Artifact
+    - task: AzureCLI@2
+      displayName: 'Package and Push Helm Chart'
+      inputs:
+        azureSubscription: 'arm-sc' 
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          # 1. Login to ACR for Helm
+          USER_NAME="00000000-0000-0000-0000-000000000000"
+          PASSWORD=$(az acr login --name $(acrHost) --expose-token --output tsv --query accessToken)
+          helm registry login $(acrHost) --username $USER_NAME --password $PASSWORD
+
+          # 2. Package and Push
+          helm package ./weather-app --version 1.0.$(Build.BuildId)
+          helm push weather-app-1.0.$(Build.BuildId).tgz oci://$(acrHost)/helm
